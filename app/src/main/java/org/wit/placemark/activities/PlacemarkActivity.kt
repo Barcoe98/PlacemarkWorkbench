@@ -16,6 +16,8 @@ class PlacemarkActivity : AppCompatActivity(), AnkoLogger {
 
     var placemark = PlacemarkModel()
     lateinit var app : MainApp
+    var edit = false
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -26,28 +28,28 @@ class PlacemarkActivity : AppCompatActivity(), AnkoLogger {
         setSupportActionBar(toolbarAdd)
 
         if (intent.hasExtra("placemark_edit")) {
-           // btnAdd.settext("we")
-
+            edit = true
             placemark = intent.extras.getParcelable<PlacemarkModel>("placemark_edit")
             placemarkTitle.setText(placemark.title)
             description.setText(placemark.description)
+            btnAdd.setText(R.string.save_placemark)
         }
 
         btnAdd.setOnClickListener() {
             placemark.title = placemarkTitle.text.toString()
             placemark.description = description.text.toString()
-            if (placemark.title.isNotEmpty()) {
-                ///app.placemarks.add(placemark.copy())
-                app.placemarks.create(placemark.copy())
-                info("add Button Pressed: $placemarkTitle")
-                // app.placemarks.findAll().forEach{ info("add Button Pressed: ${it}") }
-                setResult(AppCompatActivity.RESULT_OK)
-                finish()
-
+            if (placemark.title.isEmpty()) {
+                toast(R.string.enter_placemark_title)
+            } else {
+                if (edit) {
+                    app.placemarks.update(placemark.copy())
+                } else {
+                    app.placemarks.create(placemark.copy())
+                }
             }
-            else {
-                toast ("Please Enter a title")
-            }
+            info("add Button Pressed: $placemarkTitle")
+            setResult(AppCompatActivity.RESULT_OK)
+            finish()
         }
     }
 
